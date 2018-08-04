@@ -40,12 +40,11 @@ def show_n_random_images(n, images):
 
 
 def show_image(n, images):
-    for counter in range(n):
-        row_no = random.randint(1,500)
-        a = np.array(images[row_no, :], dtype=int)
-        b = np.reshape(a, (-1, 28))
-        img = Image.fromarray(b)
-        img.show()
+    row_no = n
+    a = np.array(images[row_no, :], dtype=int)
+    b = np.reshape(a, (-1, 28))
+    img = Image.fromarray(b)
+    img.show(title=row_no)
 
 
 X, Y = read_dataset()
@@ -127,7 +126,7 @@ sess.run(init)
 # mse_history = []
 # accuracy_history = []
 
-for epoch in range(training_epocs):
+for epoch in range(1000):
     sess.run(training_steps, feed_dict={x: X, y_: Y})
     cost = sess.run(cost_function, feed_dict={x: X, y_: Y})
     cost_history = np.append(cost_history, cost)
@@ -145,8 +144,15 @@ for epoch in range(training_epocs):
 save_path = saver.save(sess,model_path)
 print('model saved in ', save_path)
 
+d = multilayer_perceptron(x, weights, biases)
+prediction = tf.argmax(y, 1)
+prediction_run = sess.run(prediction, feed_dict={x: X[0].reshape(1,784)})
 
 
-prediction_run = sess.run(prediction, feed_dict={x: X[1].reshape(1,60)})
-
-print(prediction_run)
+for ctr in range(3):
+    row_no = random.randint(1, 800)
+    d = multilayer_perceptron(x, weights, biases)
+    prediction = tf.argmax(y, 1)
+    prediction_run = sess.run(prediction, feed_dict={x: X[row_no].reshape(1, 784)})
+    show_image(row_no,X)
+    print('row no : ',row_no ,'predicted value ',prediction_run,'actual value',Y[row_no])
